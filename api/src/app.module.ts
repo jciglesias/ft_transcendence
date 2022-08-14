@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { PongController } from './pong/pong.controller'
+import { ChatModule } from './chat/chat.module';
 import { PongModule } from './pong/pong.module';
-// import { PongService } from './pong/pong.service'
 
 @Module({
-  imports: [PongModule],
+  imports: [PongModule, ChatModule],
   controllers: [AppController],
   providers: [AppService],
 })
