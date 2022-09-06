@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  OnLine
+  OffLine
+}
+
+enum UserRole {
+  User
+  Admin
+}
+
+enum ChannelStatus {
+  Active
+  Inactive
+}
+
+model User {
+  id  Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  login String @unique
+  name String
+  email String @unique
+  level Float
+  score Int
+  // token String
+  photo String?
+  twoFA Boolean
+  twoFApwd String?
+  status UserStatus
+  role UserRole
+
+// Oposit Relations:
+
+  channelList JoinChannel[]
+  mutedChannel muteUser[]
+  adminChannel makeAdmin[]
+  blockedUsersList User[] @relation(name: "blocked")
+  winnedMatchs  Match[] @relation(name: "win")
+  lostMatchs  Match[] @relation(name: "lost")
+  friendList User[] @relation(name: "friends")
+  channelMessage ChannelMessage[]
+  privMessageSent PrivMessage[] @relation(name: "sent")
+  privMessageReceived PrivMessage[] @relation(name: "received")
+
+// Relations:
+
+  friendId  Int
+  blockedId Int
+  friend User @relation(name: "friends",fields: [friendId], references: [id])
+  blockUser User @relation(name: "blocked", fields: [blockedId], references: [id])
+}
+
+model Match {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  winnerScore Int
+  looserScore Int
+
+// Relations:
+
+  winnerid Int
+  looserid Int
+  winner User @relation(name: "win", fields: [winnerid], references: [id])
+  looser User @relation(name: "lost", fields: [looserid], references: [id])
+}
+
+model Channel {
+  id Int @id @default(autoincrement())
+  ChannelName String @unique
+  pwd String?
+  status ChannelStatus
+
+// Oposit Relations:
+
+  userList JoinChannel[]
+  userAdminList makeAdmin[]
+  mutedUserList muteUser[]
+  messages ChannelMessage[]
+}
+
+model makeAdmin {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+// Relations:
+
+  channelId Int
+  userId Int
+  channel Channel @relation(fields: [channelId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  @@unique([channelId, userId])
+}
+
+model muteUser {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+// Relations:
+
+  channelId Int
+  userId Int
+  channel Channel @relation(fields: [channelId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  @@unique([channelId, userId])
+}
+
+model JoinChannel {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+// Relations:
+
+  userId Int
+  channelId Int
+  user User @relation(fields: [userId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [id])
+  @@unique([channelId, userId])
+}
+
+model ChannelMessage {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  message String
+
+// Relations
+  fromId  Int
+  channelId Int
+  from User @relation(fields: [fromId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [id])
+}
+
+model PrivMessage {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  message String
+
+// Relations:
+  fromId Int
+  toId Int
+  from User @relation(name: "sent", fields: [fromId], references: [id])
+  to User @relation(name: "received", fields: [toId], references: [id])
+}
