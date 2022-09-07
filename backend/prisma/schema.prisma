@@ -26,9 +26,9 @@ enum ChannelStatus {
 }
 
 model User {
-  id  Int @id @default(autoincrement())
+  // id  Int @id @default(autoincrement())
+  login String @id
   createdAt DateTime @default(now())
-  login String @unique
   name String
   email String @unique
   level Float
@@ -45,20 +45,15 @@ model User {
   channelList JoinChannel[]
   mutedChannel muteUser[]
   adminChannel makeAdmin[]
-  blockedUsersList User[] @relation(name: "blocked")
   winnedMatchs  Match[] @relation(name: "win")
   lostMatchs  Match[] @relation(name: "lost")
-  friendList User[] @relation(name: "friends")
   channelMessage ChannelMessage[]
   privMessageSent PrivMessage[] @relation(name: "sent")
   privMessageReceived PrivMessage[] @relation(name: "received")
-
-// Relations:
-
-  friendId  Int
-  blockedId Int
-  friend User @relation(name: "friends",fields: [friendId], references: [id])
-  blockUser User @relation(name: "blocked", fields: [blockedId], references: [id])
+  friend AddFriend[] @relation(name: "friend")
+  befriend AddFriend[] @relation(name: "befriend")
+  blockedUsers BlockUser[] @relation(name: "blocker")
+  blockedFrom BlockUser[] @relation(name: "blocked")
 }
 
 model Match {
@@ -69,15 +64,15 @@ model Match {
 
 // Relations:
 
-  winnerid Int
-  looserid Int
-  winner User @relation(name: "win", fields: [winnerid], references: [id])
-  looser User @relation(name: "lost", fields: [looserid], references: [id])
+  winnerid String
+  looserid String
+  winner User @relation(name: "win", fields: [winnerid], references: [login])
+  looser User @relation(name: "lost", fields: [looserid], references: [login])
 }
 
 model Channel {
   id Int @id @default(autoincrement())
-  ChannelName String @unique
+  channelName String @unique
   pwd String?
   status ChannelStatus
 
@@ -96,9 +91,9 @@ model makeAdmin {
 // Relations:
 
   channelId Int
-  userId Int
+  userId String
   channel Channel @relation(fields: [channelId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [login])
   @@unique([channelId, userId])
 }
 
@@ -109,9 +104,9 @@ model muteUser {
 // Relations:
 
   channelId Int
-  userId Int
+  userId String
   channel Channel @relation(fields: [channelId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [login])
   @@unique([channelId, userId])
 }
 
@@ -121,9 +116,9 @@ model JoinChannel {
 
 // Relations:
 
-  userId Int
+  userId String
   channelId Int
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [login])
   channel Channel @relation(fields: [channelId], references: [id])
   @@unique([channelId, userId])
 }
@@ -134,9 +129,9 @@ model ChannelMessage {
   message String
 
 // Relations
-  fromId  Int
+  fromId  String
   channelId Int
-  from User @relation(fields: [fromId], references: [id])
+  from User @relation(fields: [fromId], references: [login])
   channel Channel @relation(fields: [channelId], references: [id])
 }
 
@@ -146,8 +141,30 @@ model PrivMessage {
   message String
 
 // Relations:
-  fromId Int
-  toId Int
-  from User @relation(name: "sent", fields: [fromId], references: [id])
-  to User @relation(name: "received", fields: [toId], references: [id])
+  fromId String
+  toId String
+  from User @relation(name: "sent", fields: [fromId], references: [login])
+  to User @relation(name: "received", fields: [toId], references: [login])
+}
+
+model AddFriend {
+  id Int @id @default(autoincrement())
+  createdAd DateTime @default(now())
+
+// Relations:
+  friend1Id String
+  friend2Id String
+  friend1 User @relation(name: "friend", fields: [friend1Id], references: [login])
+  friend2 User @relation(name: "befriend", fields: [friend2Id], references: [login])
+}
+
+model BlockUser {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+// Relations:
+  blockerId String
+  blockedId String
+  blocker User @relation(name: "blocker", fields: [blockerId], references: [login])
+  blocked User @relation(name: "blocked", fields: [blockedId], references: [login])
 }
