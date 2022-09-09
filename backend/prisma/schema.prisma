@@ -33,7 +33,7 @@ model User {
   email String @unique
   level Float
   score Int
-  // token String
+  token String
   photo String?
   twoFA Boolean
   twoFApwd String?
@@ -50,7 +50,7 @@ model User {
   channelMessage ChannelMessage[]
   privMessageSent PrivMessage[] @relation(name: "sent")
   privMessageReceived PrivMessage[] @relation(name: "received")
-  friend AddFriend[] @relation(name: "friend")
+  friends AddFriend[] @relation(name: "friend")
   befriend AddFriend[] @relation(name: "befriend")
   blockedUsers BlockUser[] @relation(name: "blocker")
   blockedFrom BlockUser[] @relation(name: "blocked")
@@ -71,8 +71,8 @@ model Match {
 }
 
 model Channel {
-  id Int @id @default(autoincrement())
-  channelName String @unique
+  channelName String @id
+  is_pwd Boolean
   pwd String?
   status ChannelStatus
 
@@ -90,9 +90,9 @@ model makeAdmin {
 
 // Relations:
 
-  channelId Int
+  channelId String
   userId String
-  channel Channel @relation(fields: [channelId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [channelName])
   user User @relation(fields: [userId], references: [login])
   @@unique([channelId, userId])
 }
@@ -103,9 +103,9 @@ model muteUser {
 
 // Relations:
 
-  channelId Int
+  channelId String
   userId String
-  channel Channel @relation(fields: [channelId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [channelName])
   user User @relation(fields: [userId], references: [login])
   @@unique([channelId, userId])
 }
@@ -117,9 +117,9 @@ model JoinChannel {
 // Relations:
 
   userId String
-  channelId Int
+  channelId String
   user User @relation(fields: [userId], references: [login])
-  channel Channel @relation(fields: [channelId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [channelName])
   @@unique([channelId, userId])
 }
 
@@ -130,9 +130,9 @@ model ChannelMessage {
 
 // Relations
   fromId  String
-  channelId Int
+  channelId String
   from User @relation(fields: [fromId], references: [login])
-  channel Channel @relation(fields: [channelId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [channelName])
 }
 
 model PrivMessage {
@@ -154,8 +154,8 @@ model AddFriend {
 // Relations:
   friend1Id String
   friend2Id String
-  friend1 User @relation(name: "friend", fields: [friend1Id], references: [login])
-  friend2 User @relation(name: "befriend", fields: [friend2Id], references: [login])
+  friend1 User @relation(name: "befriend", fields: [friend1Id], references: [login])
+  friend2 User @relation(name: "friend", fields: [friend2Id], references: [login])
 }
 
 model BlockUser {
