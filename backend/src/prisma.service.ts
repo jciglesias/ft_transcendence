@@ -234,4 +234,46 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     })
     return chan;
   }
+
+  async getChannelUsers(channel_name: string) {
+    const userList = await prisma.channel.findMany({
+      where: { channelName: channel_name },
+      select: {
+        userList: {
+          select: {
+            login: true,
+            name: true,
+            email: true,
+            level: true,
+            score: true,
+            photo: true,
+            status: true,
+          }
+        }
+      }
+    })
+    return userList;
+  }
+
+  async getChannel10BestUsers(channel_name: string) {
+    const userList = await prisma.channel.findMany({
+      where: { channelName: channel_name },
+      select: {
+        userList: {
+          select: {
+            login: true,
+            name: true,
+            email: true,
+            level: true,
+            score: true,
+            photo: true,
+            status: true,
+          },
+          orderBy: { level: 'asc' }
+        }
+      },
+      take: 10
+    })
+    return userList;
+  }
 }
