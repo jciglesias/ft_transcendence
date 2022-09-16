@@ -235,8 +235,45 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     return chan;
   }
 
+  async getRatio(login: string) {
+    const usr = await prisma.user.findUnique({
+      where: {login: login},
+      select: {
+        winnedMatchs: true,
+        lostMatchs: true
+      }
+    })
+    let winnedNb = 0;
+    for (let a = 0; usr.winnedMatchs[a]; a++)
+      winnedNb++;
+    let lostNb = 0;
+    for (let a = 0; usr.lostMatchs[a]; a++)
+      lostNb++;
+    const ratio = [ winnedNb, lostNb ];
+    return ratio;
+  }
+
+  async getMatchHistory(login: string) {
+    const usr = await prisma.user.findUnique({
+      where: {login: login},
+      select: {
+        winnedMatchs: true,
+        lostMatchs: true
+      }
+    })
+    const matchs = usr.winnedMatchs.concat(usr.lostMatchs);
+    const sortedMatchs = matchs.sort((a, b) => {
+      if(a.createdAt < b.createdAt)
+        return -1;
+      else if (a.createdAt > b.createdAt)
+        return 1;
+      return 0;
+    })
+    return sortedMatchs;
+  }
+
   async getChannelUsers(channel_name: string) {
-    const userList = await prisma.channel.findMany({
+    const channel = await prisma.channel.findMany({
       where: { channelName: channel_name },
       select: {
         userList: {
@@ -252,11 +289,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         }
       }
     })
+    const userList = channel.userList;
     return userList;
   }
 
   async getChannel10BestUsers(channel_name: string) {
-    const userList = await prisma.channel.findMany({
+    const channel = await prisma.channel.findMany({
       where: { channelName: channel_name },
       select: {
         userList: {
@@ -274,6 +312,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       },
       take: 10
     })
+    const userList = { channel };
     return userList;
   }
 }
