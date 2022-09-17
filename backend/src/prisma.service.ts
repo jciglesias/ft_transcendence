@@ -238,7 +238,13 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   async getTopTen() {
     const list = await prisma.user.findMany({
       select: {
+        email: true,
         login: true,
+        name: true,
+        photo: true,
+        winnedMatchs: true,
+        lostMatchs: true,
+        score: true,
       },
       orderBy: { score: 'asc' },
       take: 10,
