@@ -234,4 +234,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     })
     return chan;
   }
+
+  async getTopTen() {
+    const list = await prisma.user.findMany({
+      select: {
+        login: true,
+      },
+      orderBy: { score: 'asc' },
+      take: 10,
+    })
+    return list;
+  }
 }
