@@ -242,13 +242,38 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         login: true,
         name: true,
         photo: true,
-        winnedMatchs: true,
-        lostMatchs: true,
         score: true,
+        status: true,
       },
       orderBy: { score: 'asc' },
       take: 10,
     })
-    return list;
+    let users: {
+      score: number,
+      login: string,
+      name: string,
+      email: string,
+      photo: string,
+      online: boolean,
+      win: number,
+      lost: number,
+    }[]
+    for (let i = 0; list[i]; i++) {
+      users[i].score = list[i].score;
+      users[i].login = list[i].login;
+      users[i].name = list[i].name;
+      users[i].email = list[i].email;
+      users[i].photo = list[i].photo;
+      users[i].online = false;
+      if (list[i].status == UserStatus.OnLine)
+        users[i].online = true;
+      users[i].win = await prisma.match.count({
+        where: { winnerid: users[i].login },
+      });
+      users[i].lost = await prisma.match.count({
+        where: { looserid: users[i].login },
+      });
+    }
+    return users;
   }
 }
