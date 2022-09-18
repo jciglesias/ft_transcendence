@@ -31,7 +31,7 @@ model User {
   createdAt DateTime @default(now())
   name String
   email String @unique
-  level Float
+  level Float //
   score Int
   atoken String @unique
   rtoken String @unique
@@ -55,6 +55,7 @@ model User {
   befriend AddFriend[] @relation(name: "befriend")
   blockedUsers BlockUser[] @relation(name: "blocker")
   blockedFrom BlockUser[] @relation(name: "blocked")
+  bannedFrom BanUser[]
 }
 
 model Match {
@@ -72,6 +73,7 @@ model Match {
 }
 
 model Channel {
+  createdAt DateTime @default(now())
   channelName String @id
   is_pwd Boolean
   pwd String?
@@ -82,6 +84,7 @@ model Channel {
   userList JoinChannel[]
   userAdminList makeAdmin[]
   mutedUserList muteUser[]
+  bannedUsers BanUser[]
   messages ChannelMessage[]
 }
 
@@ -111,6 +114,19 @@ model muteUser {
   @@unique([channelId, userId])
 }
 
+model BanUser {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // Relations:
+
+  channelId String
+  userId String
+  channel Channel @relation(fields: [channelId], references: [channelName])
+  user User @relation(fields: [userId], references: [login])
+  @@unique([channelId, userId])
+}
+
 model JoinChannel {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -129,7 +145,8 @@ model ChannelMessage {
   createdAt DateTime @default(now())
   message String
 
-// Relations
+// Relations:
+
   fromId  String
   channelId String
   from User @relation(fields: [fromId], references: [login])

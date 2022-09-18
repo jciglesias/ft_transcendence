@@ -24,20 +24,22 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     role: UserRole,
     rtoken: string,
     atoken: string) {
-      await prisma.user.create({
-      data: {
-        login: login,
-        name: name,
-        email: email,
-        level: 0.0,
-        score: 0,
-        atoken: atoken,
-        rtoken: rtoken,
-        twoFA: false,
-        status: UserStatus.OnLine,
-        role: role,
-      },
-    })
+      await prisma.user.upsert({
+        where: { login: login },
+        update: { atoken: atoken, rtoken: rtoken },
+        create: {
+          login: login,
+          name: name,
+          email: email,
+          level: 0.0,
+          score: 0,
+          atoken: atoken,
+          rtoken: rtoken,
+          twoFA: false,
+          status: UserStatus.OnLine,
+          role: role,
+        }
+      })
   }
 
   async setChannel(name: string) {
