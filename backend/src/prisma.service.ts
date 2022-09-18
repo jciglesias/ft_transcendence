@@ -17,15 +17,22 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async setUser(login: string, name: string, email: string, role: UserRole, token: string) {
-    await prisma.user.create({
+  async setUser(
+    login: string,
+    name: string,
+    email: string,
+    role: UserRole,
+    rtoken: string,
+    atoken: string) {
+      await prisma.user.create({
       data: {
         login: login,
         name: name,
         email: email,
         level: 0.0,
         score: 0,
-        token: token,
+        atoken: atoken,
+        rtoken: rtoken,
         twoFA: false,
         status: UserStatus.OnLine,
         role: role,
@@ -245,7 +252,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         score: true,
         status: true,
       },
-      orderBy: { score: 'asc' },
+      orderBy: { score: 'desc' },
       take: 10,
     })
     let users: {
@@ -275,5 +282,52 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       });
     }
     return users;
+  }
+
+  async getMatchHistory(login: string) {
+    const list = await prisma.user.findUnique({
+      where: { login: login },
+      select: { 
+        winnedMatchs: { orderBy: {createdAt: 'desc'} },
+        lostMatchs: { orderBy: {createdAt: 'desc'} },
+      },
+    });
+    return list.lostMatchs.concat(list.winnedMatchs).sort((a, b) => {
+      if(a.createdAt < b.createdAt)
+        return -1;
+      else if (a.createdAt > b.createdAt)
+        return 1;
+      return 0;
+    });
+  }
+
+  async getRatio(login: string) {
+    const wins = await prisma.match.count({
+      where: { winnerid: login }
+    });
+    const lost = await prisma.match.count({
+      where: { looserid: login }
+    });
+    return [wins, lost];
+  }
+
+  async getChannelUsers(channel_name: string) {
+    const channel = await prisma.channel.findUnique({
+      where: { channelName: channel_name },
+      select: {
+        userList: {
+          select: { user: { select: {
+            login: true,
+            name: true,
+            email: true,
+            level: true,
+            score: true,
+            photo: true,
+            status: true,
+          }}}
+        }
+      }
+    })
+    return channel.userList;
   }
 }
