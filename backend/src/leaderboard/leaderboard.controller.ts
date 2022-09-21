@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import { PrismaService } from "src/prisma.service";
+import { PrismaService, accountUser } from "src/prisma.service";
 
 @Controller('leaderboard')
 export class LeaderBoardController {

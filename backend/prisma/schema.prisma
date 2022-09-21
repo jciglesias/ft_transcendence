@@ -10,16 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserStatus {
-  OnLine
-  OffLine
-}
-
-enum UserRole {
-  User
-  Admin
-}
-
 enum ChannelStatus {
   Active
   Inactive
@@ -35,11 +25,11 @@ model User {
   score Int
   atoken String @unique
   rtoken String @unique
-  photo String?
+  photo String
   twoFA Boolean
   twoFApwd String?
-  status UserStatus
-  role UserRole
+  isOnline Boolean
+  isAdmin Boolean
 
 // Oposit Relations:
 
