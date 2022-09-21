@@ -10,11 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ChannelStatus {
-  Active
-  Inactive
-}
-
 model User {
   // id  Int @id @default(autoincrement())
   login String @id
@@ -67,7 +62,7 @@ model Channel {
   channelName String @id
   is_pwd Boolean
   pwd String?
-  status ChannelStatus
+  isActive Boolean
 
 // Oposit Relations:
 

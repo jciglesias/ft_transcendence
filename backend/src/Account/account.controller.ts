@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Controller('account')
 export class AccountController {
-    constructor(private jwtService: JwtService, private db: PrismaService) {}
+    constructor(private db: PrismaService) {}
 
     @Get(':id')
     getUserAccount(@Param('id') id: string) {
