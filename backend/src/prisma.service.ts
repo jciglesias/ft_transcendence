@@ -1,7 +1,6 @@
 
-import { flatten, INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { ChannelStatus, PrismaClient } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime';
 
 const prisma = new PrismaClient()
 
@@ -432,5 +431,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         },
       }
     })
+    return user;
   }
 }
