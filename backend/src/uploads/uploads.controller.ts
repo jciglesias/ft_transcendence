@@ -9,7 +9,7 @@ export class UploadsController {
     @Post(':id')
     @UseInterceptors(FileInterceptor('file'))
     uploadFile(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
-        this.db.uploadPhoto(id, file.filename);
+        this.db.uploadPhoto(id, file.path);
         console.log(file);
         return file;
     }

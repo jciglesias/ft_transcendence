@@ -177,6 +177,14 @@ export async function getFriends(this: PrismaService, login: string) {
     return friendlist;
 }
 
+export async function getPhotoPath(this: PrismaService, login: string) {
+  const tmp = await this.prisma.user.findUnique({
+    where: { login: login },
+    select: { photo: { select : { filename: true } } }
+  });
+  return tmp.photo.filename;
+}
+
 export async function getUserAccount(this: PrismaService, login: string) {
     const user = await this.prisma.user.findFirst({
       where: { login: login },
