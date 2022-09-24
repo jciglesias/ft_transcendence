@@ -8,7 +8,7 @@ export async function setMatch(this: PrismaService, w_score: number, l_score: nu
       winnerid: w_login,
       looserid: l_login,
     }
-  })
+  }).catch();
 }
 
 export async function getNoWinnedMatchs(this: PrismaService, login: string) {
@@ -37,7 +37,7 @@ export async function getMatchHistory(this: PrismaService, login: string) {
         else if (a.createdAt > b.createdAt)
             return 1;
         return 0;
-    });
+    }); 
 }
   export async function getRatio(this: PrismaService, login: string) {
     const wins = await this.prisma.match.count({

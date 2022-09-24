@@ -2,7 +2,7 @@
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { getTopTen } from './prisma/leaderboard.service';
-import { setUser, getUserAccount, setFriend, set2FA, updateUserScore, updateUserStatus, getBlockedUsers, getFriends, getUser } from './prisma/user.service';
+import { setUser, getUserAccount, setFriend, set2FA, updateUserScore, updateUserStatus, getBlockedUsers, getFriends, getUser, uploadPhoto } from './prisma/user.service';
 import { getChannel, getChannelUsers, sendChannelMessage, setChannel, setChannelPass, setJoinChannel, setMakeAdmin, setMuteUser } from './prisma/channel.service';
 import { getMatchHistory, getNolostMatchs, getNoWinnedMatchs, getRatio, setMatch } from './prisma/match.service';
 
@@ -55,4 +55,5 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   public getMatchHistory = getMatchHistory;
   public getRatio = getRatio;
   public getChannelUsers = getChannelUsers;
+  public uploadPhoto = uploadPhoto;
 }

@@ -1,29 +1,53 @@
 import { PrismaService } from "src/prisma.service";
 
+export interface IAccount {
+  firstName: string,
+  lastName: string,
+  fullName: string,
+  email: string,
+  login: string,
+  imgUrl: string,
+  win?: number,
+  lost?: number,
+  winnedMatch?: any[],
+  lostMatch?: any[],
+  friends?: any[],
+  blockUsers?: any[],
+  beFriends?: any[],
+  createdAt?: Date,
+  twoFA?: boolean,
+  isAdmin?: boolean,
+  channelList?: any[],
+  channelAdmin?: any[],
+}
+
 export async function setUser(
     this: PrismaService,
     login: string,
     name: string,
+    firstname: string,
+    lastname: string,
     email: string,
     isAdmin: boolean,
     rtoken: string,
     atoken: string,
-    photo: string) {
+    imgUrl: string) {
     await this.prisma.user.upsert({
         where: { login: login },
         update: { atoken: atoken, rtoken: rtoken },
         create: {
             login: login,
-            name: name,
+            fullName: name,
+            firstName: firstname,
+            lastName: lastname,
             email: email,
-            level: 0.0,
             score: 0,
             atoken: atoken,
             rtoken: rtoken,
             twoFA: false,
             isOnline: true,
             isAdmin: isAdmin,
-            photo: photo
+            imgUrl: imgUrl
         }
     })
 }
@@ -76,11 +100,10 @@ export async function getBlockedUsers(this: PrismaService,login: string) {
                 blocked: {
                     select: {
                         login: true,
-                        name: true,
+                        fullName: true,
                         email: true,
-                        level: true,
                         score: true,
-                        photo: true,
+                        imgUrl: true,
                         isOnline: true,
                     }
                 }
@@ -101,6 +124,14 @@ export async function getUser(this: PrismaService, login: string) {
     return usr;
 }
 
+export async function uploadPhoto(this: PrismaService, login: string, filename:string) {
+  await this.photos.upsert({
+    where: {userId: login},
+    update: {filename: filename},
+    create: {filename: filename, userId: login}
+  })
+}
+
 export async function getFriends(this: PrismaService, login: string) {
     const friends = await this.prisma.user.findUnique({
         where: { login: login },
@@ -110,11 +141,10 @@ export async function getFriends(this: PrismaService, login: string) {
               friend1: {
                 select: {
                   login: true,
-                  name: true,
+                  fullName: true,
                   email: true,
-                  level: true,
                   score: true,
-                  photo: true,
+                  imgUrl: true,
                   isOnline: true,
                 }
               },
@@ -125,11 +155,10 @@ export async function getFriends(this: PrismaService, login: string) {
               friend2: {
                 select: {
                   login: true,
-                  name: true,
+                  fullName: true,
                   email: true,
-                  level: true,
                   score: true,
-                  photo: true,
+                  imgUrl: true,
                   isOnline: true,
                 }
               },
@@ -154,20 +183,15 @@ export async function getUserAccount(this: PrismaService, login: string) {
       select: {
         login: true,
         createdAt: true,
-        name: true,
+        fullName: true,
+        firstName: true,
+        lastName: true,
         email: true,
-        level: true,
         score: true,
-        photo: true,
-        twoFA: true,
-        isOnline: true,
+        imgUrl: true,
+        twoFA: true,  
         isAdmin: true,
         channelList: {
-          select: {
-            channelId: true,
-          }
-        },
-        mutedChannel: {
           select: {
             channelId: true,
           }
@@ -200,7 +224,7 @@ export async function getUserAccount(this: PrismaService, login: string) {
             friend1: {
               select: {
                 login: true,
-                name: true,
+                fullName: true,
                 isOnline: true,
               }
             },
@@ -211,7 +235,7 @@ export async function getUserAccount(this: PrismaService, login: string) {
             friend2: {
               select: {
                 login: true,
-                name: true,
+                fullName: true,
                 isOnline: true,
               }
             }
@@ -222,17 +246,44 @@ export async function getUserAccount(this: PrismaService, login: string) {
             blockedId: true,
           }
         },
-        blockedFrom: {
-          select: {
-            blockerId: true,
-          }
-        },
-        bannedFrom: {
-          select: {
-            channelId: true,
-          }
-        },
       }
     })
-    return user;
+    let userAccount = {} as IAccount;
+    if (user) {
+      userAccount.firstName = user.firstName;
+      userAccount.lastName = user.lastName;
+      userAccount.fullName = user.fullName;
+      userAccount.email = user.email;
+      userAccount.login = user.login;
+      userAccount.imgUrl = user.imgUrl;
+      userAccount.winnedMatch = user.winnedMatchs;
+      userAccount.lostMatch = user.lostMatchs;
+      userAccount.win = 0;
+      for (let i = 0; user.winnedMatchs[i]; i++) {
+        userAccount.win++;
+      }
+      userAccount.lost = 0;
+      for (let i = 0; user.lostMatchs[i]; i++) {
+        userAccount.lost++;
+      }
+      for (let i = 0; user.befriend[i]; i++) {
+        userAccount.friends.push(user.friends[i].friend1);
+      }
+      for (let i = 0; user.blockedUsers[i]; i++) {
+        userAccount.blockUsers.push(user.blockedUsers[i].blockedId);
+      }
+      for (let i = 0; user.befriend[i]; i++) {
+        userAccount.beFriends.push(user.befriend[i].friend2);
+      }
+      userAccount.createdAt = user.createdAt;
+      userAccount.twoFA = user.twoFA;
+      userAccount.isAdmin = user.isAdmin;
+      for (let i in user.channelList) {
+        userAccount.channelList.push(i);
+      }
+      for (let i in user.adminChannel) {
+        userAccount.channelAdmin.push(i);
+      }
+    }
+    return userAccount;
 }

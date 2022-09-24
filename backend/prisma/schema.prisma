@@ -14,13 +14,15 @@ model User {
   // id  Int @id @default(autoincrement())
   login String @id
   createdAt DateTime @default(now())
-  name String
+  fullName String
+  firstName String
+  lastName String
   email String @unique
-  level Float //
   score Int
   atoken String @unique
   rtoken String @unique
-  photo String
+  imgUrl String
+  photo Photos?
   twoFA Boolean
   twoFApwd String?
   isOnline Boolean
@@ -34,8 +36,6 @@ model User {
   winnedMatchs  Match[] @relation(name: "win")
   lostMatchs  Match[] @relation(name: "lost")
   channelMessage ChannelMessage[]
-  privMessageSent PrivMessage[] @relation(name: "sent")
-  privMessageReceived PrivMessage[] @relation(name: "received")
   friends AddFriend[] @relation(name: "friend")
   befriend AddFriend[] @relation(name: "befriend")
   blockedUsers BlockUser[] @relation(name: "blocker")
@@ -138,18 +138,6 @@ model ChannelMessage {
   channel Channel @relation(fields: [channelId], references: [channelName])
 }
 
-model PrivMessage {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  message String
-
-// Relations:
-  fromId String
-  toId String
-  from User @relation(name: "sent", fields: [fromId], references: [login])
-  to User @relation(name: "received", fields: [toId], references: [login])
-}
-
 model AddFriend {
   id Int @id @default(autoincrement())
   createdAd DateTime @default(now())
@@ -170,4 +158,14 @@ model BlockUser {
   blockedId String
   blocker User @relation(name: "blocker", fields: [blockerId], references: [login])
   blocked User @relation(name: "blocked", fields: [blockedId], references: [login])
+}
+
+model Photos {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  filename String
+
+// Relations:
+  userId String @unique
+  user User @relation(fields: [userId], references: [login])
 }

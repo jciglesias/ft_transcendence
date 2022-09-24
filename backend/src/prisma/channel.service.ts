@@ -61,11 +61,10 @@ export async function getChannelUsers(this: PrismaService, channel_name: string)
         userList: {
           select: { user: { select: {
             login: true,
-            name: true,
+            fullName: true,
             email: true,
-            level: true,
             score: true,
-            photo: true,
+            imgUrl: true,
             isOnline: true,
           }}}
         }

@@ -5,8 +5,8 @@ export async function getTopTen(this: PrismaService) {
       select: {
         email: true,
         login: true,
-        name: true,
-        photo: true,
+        fullName: true,
+        imgUrl: true,
         score: true,
         isOnline: true,
       },
@@ -18,9 +18,9 @@ export async function getTopTen(this: PrismaService) {
       const user: accountUser = {
         score: list[i].score,
         login: list[i].login,
-        name: list[i].name,
+        name: list[i].fullName,
         email: list[i].email,
-        photo: list[i].photo,
+        photo: list[i].imgUrl,
         online: list[i].isOnline,
         win: await this.getNoWinnedMatchs(list[i].login),
         lost: await this.getNolostMatchs(list[i].login),
