@@ -8,8 +8,8 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    this.db.setUser("jiglesia", "Juan Iglesias", "jiglesia@student.42.fr", false, "token jiglesia", "atoken jiglesia", "photo url");
-    this.db.setUser("mravily", "Medhi Ravily", "mravily@student.42.fr", false, "token mravily", "atoken mravily", "photo url ");
+    this.db.setUser("jiglesia", "Juan Iglesias", "Juan", "Iglesias", "jiglesia@student.42.fr", false, "token jiglesia", "atoken jiglesia", "photo url");
+    this.db.setUser("mravily", "Medhi Ravily", "Medhi", "Ravily", "mravily@student.42.fr", false, "token mravily", "atoken mravily", "photo url ");
     // this.db.setChannel("new channel");
     this.db.setMatch(100, 50, "jiglesia", "mravily");
     return this.appService.getHello();
