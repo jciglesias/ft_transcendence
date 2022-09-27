@@ -10,4 +10,9 @@ export class LeaderBoardController {
     getLeaderBoard() {
         return this.db.getTopTen();
     }
+
+    @Get('all')
+    getAllRanking() {
+        return this.db.getUsersRanking();
+    }
 }

@@ -11,7 +11,6 @@ datasource db {
 }
 
 model User {
-  // id  Int @id @default(autoincrement())
   login String @id
   createdAt DateTime @default(now())
   fullName String
@@ -41,6 +40,7 @@ model User {
   blockedUsers BlockUser[] @relation(name: "blocker")
   blockedFrom BlockUser[] @relation(name: "blocked")
   bannedFrom BanUser[]
+  // channelsCreated Channel[]
 }
 
 model Match {
@@ -63,6 +63,10 @@ model Channel {
   is_pwd Boolean
   pwd String?
   isActive Boolean
+
+// Relations:
+  // creatorId String
+  // creator User @relation(fields: [creatorId], references: [login])
 
 // Oposit Relations:
 
